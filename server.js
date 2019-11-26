@@ -1,98 +1,50 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cors = require("cors");
 const bcrypt = require("bcrypt-nodejs");
+const cors = require("cors");
+const knex = require("knex");
+
+const register = require("./controllers/register");
+const signin = require("./controllers/signin");
+const profile = require("./controllers/profile");
+const image = require("./controllers/image");
+
+const db = knex({
+	client: "pg",
+	connection: {
+		host: "127.0.0.1",
+		user: "recognize",
+		password: "",
+		database: "recognize"
+	}
+});
 
 const app = express();
 
+app.use(cors());
 app.use(bodyParser.json());
-app.use(cors);
 
-const database = {
-    users: [
-        {
-            id: "123",
-            name: "John",
-            email: "john@gmail.com",
-            password: "cookies",
-            entries: 0,
-            joined: new Date()
-        },
-        {
-            id: "124",
-            name: "Sally",
-            email: "sally@gmail.com",
-            password: "bananas",
-            entries: 0,
-            joined: new Date()
-        }
-    ]
-};
 app.get("/", (req, res) => {
-    res.send("this is working");
+	res.send(db.users);
 });
-
-app.get("/users", (req, res) => {
-    res.json(database.users);
-});
-
-app.post("/signin", (req, res) => {
-    //console.log(req.body.email + "," + database.users[0].email);
-    if (
-        req.body.email === database.users[0].email &&
-        req.body.password === database.users[0].password
-    ) {
-        res.json("success");
-    } else {
-        res.status(400).json("failure");
-    }
-});
+app.post("/signin", signin.handleSignin(db, bcrypt));
 
 app.post("/register", (req, res) => {
-    const { email, name, password } = req.body;
-
-    database.users.push({
-        id: "125",
-        name: name,
-        email: email,
-        password: password,
-        entries: 0,
-        joined: new Date()
-    });
-    res.json(database.users[database.users.length - 1]);
+	register.handleRegister(req, res, db, bcrypt);
 });
-
-function findUser(id) {
-    database.users.forEach(user => {
-        if (user.id === id) {
-            return database.users[id];
-        }
-    });
-
-    return false;
-}
 
 app.get("/profile/:id", (req, res) => {
-    database.users.forEach(user => {
-        if (user.id === req.params.id) {
-            res.json(user);
-        }
-    });
-
-    res.status(400).json("User not found");
+	profile.handleProfileGet(req, res, db);
 });
 
-app.post("/image", (req, res) => {
-    database.users.forEach(user => {
-        if (user.id === req.body.id) {
-            user.entries++;
-            return res.json(user.entries);
-        }
-    });
+app.put("/image", (req, res) => {
+	image.handleImage(req, res, db);
+});
 
-    res.status(400).json("User not found");
+app.post("/imageurl", (req, res) => {
+	image.handleApiCall(req, res);
 });
 
 app.listen(3000, () => {
-    console.log("app is running");
+	console.log("app is running on port 3000");
 });
