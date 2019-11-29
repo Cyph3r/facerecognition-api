@@ -50,6 +50,10 @@ app.post("/imageurl", (req, res) => {
 	image.handleApiCall(req, res);
 });
 
+app.post("/test", (req, res) => {
+	res.send("It is working!");
+});
+
 app.listen(port, () => {
 	console.log(`app is running on port ${port}`);
 });
