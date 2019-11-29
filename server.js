@@ -50,7 +50,7 @@ app.post("/imageurl", (req, res) => {
 	image.handleApiCall(req, res);
 });
 
-app.post("/test", (req, res) => {
+app.get("/test", (req, res) => {
 	res.send("It is working!");
 });
 
