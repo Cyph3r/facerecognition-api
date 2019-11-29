@@ -9,13 +9,18 @@ const signin = require("./controllers/signin");
 const profile = require("./controllers/profile");
 const image = require("./controllers/image");
 
+const dotenv = require("dotenv");
+dotenv.config();
+
+const port = process.env.PORT || 3000;
+
 const db = knex({
 	client: "pg",
 	connection: {
-		host: "192.168.1.3",
-		user: "postgres",
-		password: "postgres",
-		database: "recognize"
+		host: process.env.DATABASE_HOST || "127.0.0.1",
+		user: process.env.DATABASE_USER || "postgres",
+		password: process.env.DATABASE_PASSWORD || "postgres",
+		database: process.env.DATABASE_NAME || "recognize"
 	}
 });
 
@@ -45,6 +50,6 @@ app.post("/imageurl", (req, res) => {
 	image.handleApiCall(req, res);
 });
 
-app.listen(3000, () => {
-	console.log("app is running on port 3000");
+app.listen(port, () => {
+	console.log(`app is running on port ${port}`);
 });
