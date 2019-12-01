@@ -12,7 +12,7 @@ const image = require("./controllers/image");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const db =
 	process.env.NODE_ENV === "production"
